@@ -117,7 +117,7 @@ echo.
 pause
 
 REM Étape 8: Déploiement automatique vers Tomcat (copie dans webapps)
-set "TOMCAT_WEBAPPS=D:\Pxampp\tomcat\webapps"
+set "TOMCAT_WEBAPPS=C:\Users\rabet\OneDrive\Documents\Zavatra ilaina\apache-tomcat-10.1.28\webapps"
 echo.
 echo 8. Déploiement vers %TOMCAT_WEBAPPS% ...
 
