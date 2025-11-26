@@ -17,7 +17,7 @@ REM Étape 3: Compilation
 echo 3. Compilation des sources du framework...
 
 REM Compiler les annotations de base
-javac -parameters -d "build\classes" framework\annotation\Controller.java framework\annotation\GetMapping.java framework\annotation\RequestParam.java
+javac -parameters -d "build\classes" framework\annotation\Controller.java framework\annotation\GetMapping.java framework\annotation\RequestParam.java framework\annotation\PathVariable.java
 
 REM Compiler les classes utilitaires (nouveau package framework\utilitaire)
 REM IMPORTANT: compiler MappingInfo AVANT UrlMappingRegistry
@@ -60,20 +60,24 @@ REM Copier config.properties
 copy "testFramework\resources\config.properties" "testFramework\WEB-INF\classes\"
 
 REM Compiler les controllers de test
-if exist "testFramework\com\testframework\controller" (
-    javac -parameters -classpath "build\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\controller\*.java
-)
-
-if exist "testFramework\com\testframework\admin" (
-    javac -parameters -classpath "build\classes;testFramework\WEB-INF\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\admin\*.java
-)
-
+REM Compiler les modèles en premier (ex: Employee) pour que les contrôleurs les voient
 if exist "testFramework\com\testframework\model" (
     javac -parameters -classpath "build\classes;testFramework\WEB-INF\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\model\*.java
 )
 
+REM Compiler les utilitaires de test
 if exist "testFramework\com\testframework\util" (
     javac -parameters -classpath "build\classes;testFramework\WEB-INF\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\util\*.java
+)
+
+REM Compiler les controllers de test
+if exist "testFramework\com\testframework\controller" (
+    javac -parameters -classpath "build\classes;testFramework\WEB-INF\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\controller\*.java
+)
+
+REM Compiler les controllers admin (dépendent des modèles)
+if exist "testFramework\com\testframework\admin" (
+    javac -parameters -classpath "build\classes;testFramework\WEB-INF\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\admin\*.java
 )
 
 javac -parameters -classpath "build\classes;testFramework\WEB-INF\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\Main.java
