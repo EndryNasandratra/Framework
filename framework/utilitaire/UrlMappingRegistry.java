@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.List;
 
 /**
- * Responsable de la gestion du registre des mappings URL -> Classe/Methode
- * Principe de Responsabilite Unique (SRP)
+ * Responsable de la gestion du registre des mappings URL -> Classe/Méthode
+ * Principe de Responsabilité Unique (SRP)
  */
 public class UrlMappingRegistry {
     
@@ -22,12 +22,12 @@ public class UrlMappingRegistry {
     }
     
     /**
-     * Construit le registre des URLs a partir des classes scannees
+     * Construit le registre des URLs à partir des classes scannées
      * @param classes Liste des classes avec @Controller
      */
     public void buildRegistry(List<Class<?>> classes) {
         if (initialized) {
-            System.out.println("Registre deja initialise.");
+            System.out.println("Registre déjà initialisé.");
             return;
         }
         
@@ -48,27 +48,27 @@ public class UrlMappingRegistry {
         }
         
         initialized = true;
-        System.out.println("Registre construit: " + urlCount + " URL(s) mappee(s).\n");
+        System.out.println("Registre construit: " + urlCount + " URL(s) mappée(s).\n");
     }
     
     /**
      * Recherche un mapping par URL
-     * @param url L'URL a rechercher
-     * @return MappingInfo ou null si non trouve
+     * @param url L'URL à rechercher
+     * @return MappingInfo ou null si non trouvé
      */
     public MappingInfo findByUrl(String url) {
         return urlMappings.get(url);
     }
     
     /**
-     * Verifie si le registre est initialise
+     * Vérifie si le registre est initialisé
      */
     public boolean isInitialized() {
         return initialized;
     }
     
     /**
-     * Retourne le nombre d'URLs enregistrees
+     * Retourne le nombre d'URLs enregistrées
      */
     public int size() {
         return urlMappings.size();

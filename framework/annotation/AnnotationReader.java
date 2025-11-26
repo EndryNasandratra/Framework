@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-// Utilitaires deplaces
+// Utilitaires déplacés
 import framework.utilitaire.ConfigLoader;
 import framework.utilitaire.ClassScanner;
 import framework.utilitaire.UrlMappingRegistry;
@@ -13,11 +13,11 @@ import framework.utilitaire.MappingInfo;
 /**
  * Service principal pour la gestion des annotations
  * Coordonne ConfigLoader, ClassScanner et UrlMappingRegistry
- * Principe de Responsabilite Unique et Inversion de Dependance (SOLID)
+ * Principe de Responsabilité Unique et Inversion de Dépendance (SOLID)
  */
 public class AnnotationReader {
     
-    // Dependances (Dependency Injection)
+    // Dépendances (Dependency Injection)
     private static final ConfigLoader configLoader = new ConfigLoader();
     private static final ClassScanner classScanner = new ClassScanner();
     private static final UrlMappingRegistry urlRegistry = new UrlMappingRegistry();
@@ -26,7 +26,7 @@ public class AnnotationReader {
     
     
     /**
-     * Filtre les classes qui ont des methodes avec @GetMapping
+     * Filtre les classes qui ont des méthodes avec @GetMapping
      */
     private static List<Class<?>> findClassesWithMethodAnnotations(List<Class<?>> classes) {
         List<Class<?>> classesWithAnnotations = new ArrayList<>();
@@ -54,7 +54,7 @@ public class AnnotationReader {
         
         List<Class<?>> classes = classScanner.scanPackage(basePackage);
         
-        System.out.println("Classes avec @Controller decouvertes: " + classes.size());
+        System.out.println("Classes avec @Controller découvertes: " + classes.size());
         for (Class<?> c : classes) {
             System.out.println("- " + c.getName());
         }
@@ -62,37 +62,37 @@ public class AnnotationReader {
         
         List<Class<?>> annotatedClasses = findClassesWithMethodAnnotations(classes);
         
-        System.out.println("Classes utilisant l'annotation @GetMapping au niveau methode:");
+        System.out.println("Classes utilisant l'annotation @GetMapping au niveau méthode:");
         for (Class<?> clazz : annotatedClasses) {
             System.out.println("- " + clazz.getSimpleName());
             
             // Afficher aussi si la classe a l'annotation @Controller
             if (clazz.isAnnotationPresent(Controller.class)) {
-                System.out.println("  └─ Annotee avec @Controller");
+                System.out.println("  └─ Annotée avec @Controller");
             }
             
-            // Lister les methodes avec @GetMapping
+            // Lister les méthodes avec @GetMapping
             Method[] methods = clazz.getDeclaredMethods();
             for (Method method : methods) {
                 if (method.isAnnotationPresent(GetMapping.class)) {
                     GetMapping mapping = method.getAnnotation(GetMapping.class);
-                    System.out.println("  └─ Methode: " + method.getName() + " -> " + mapping.value());
+                    System.out.println("  └─ Méthode: " + method.getName() + " -> " + mapping.value());
                 }
             }
         }
     }
     
     /**
-     * Initialise le systeme en scannant toutes les URLs au demarrage
-     * Coordonne les differents composants: ConfigLoader, ClassScanner, UrlMappingRegistry
+     * Initialise le système en scannant toutes les URLs au démarrage
+     * Coordonne les différents composants: ConfigLoader, ClassScanner, UrlMappingRegistry
      */
     public static void init() {
         if (urlRegistry.isInitialized()) {
-            System.out.println("AnnotationReader deja initialise.");
+            System.out.println("AnnotationReader déjà initialisé.");
             return;
         }
         
-        System.out.println("Initialisation du systeme de mapping d'URLs...");
+        System.out.println("Initialisation du système de mapping d'URLs...");
         
         // 1. Charger la configuration
         configLoader.loadConfiguration();
@@ -100,7 +100,7 @@ public class AnnotationReader {
         
         // 2. Scanner les classes du package
         List<Class<?>> classes = classScanner.scanPackage(basePackage);
-        System.out.println("Classes avec @Controller decouvertes: " + classes.size());
+        System.out.println("Classes avec @Controller découvertes: " + classes.size());
         
         // 3. Construire le registre des URLs
         urlRegistry.buildRegistry(classes);
@@ -108,12 +108,12 @@ public class AnnotationReader {
     
     /**
      * Recherche une URL et retourne les informations de mapping
-     * @param url L'URL a rechercher
-     * @return MappingInfo ou un objet vide si non trouve (404)
+     * @param url L'URL à rechercher
+     * @return MappingInfo ou un objet vide si non trouvé (404)
      */
     public static MappingInfo findMappingByUrl(String url) {
         if (!urlRegistry.isInitialized()) {
-            System.out.println("ATTENTION: AnnotationReader n'est pas initialise. Appelez init() au demarrage.");
+            System.out.println("ATTENTION: AnnotationReader n'est pas initialisé. Appelez init() au démarrage.");
             init();
         }
         
@@ -122,8 +122,8 @@ public class AnnotationReader {
     }
     
     /**
-     * Affiche les informations de mapping pour une URL donnee
-     * @param url L'URL a rechercher
+     * Affiche les informations de mapping pour une URL donnée
+     * @param url L'URL à rechercher
      */
     public static void displayMappingForUrl(String url) {
         MappingInfo info = findMappingByUrl(url);
@@ -131,9 +131,9 @@ public class AnnotationReader {
         if (info.isFound()) {
             System.out.println("URL: " + url);
             System.out.println("Classe: " + info.getClassName());
-            System.out.println("Methode: " + info.getMethodName());
+            System.out.println("Méthode: " + info.getMethodName());
         } else {
-            System.out.println("404 - URL non trouvee: " + url);
+            System.out.println("404 - URL non trouvée: " + url);
         }
     }
 }
