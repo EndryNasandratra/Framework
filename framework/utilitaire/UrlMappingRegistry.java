@@ -1,6 +1,8 @@
 package framework.utilitaire;
 
 import framework.annotation.GetMapping;
+import framework.annotation.PostMapping;
+import framework.annotation.RequestMapping;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -11,12 +13,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Responsable de la gestion du registre des mappings URL -> Classe/Méthode
- * Principe de Responsabilité Unique (SRP)
+ * Responsable de la gestion du registre des mappings URL -> Classe/Methode
+ * Principe de Responsabilite Unique (SRP)
  */
 public class UrlMappingRegistry {
     
-    private Map<String, MappingInfo> urlMappings; // exact matches
+    // exact matches: url -> (method -> MappingInfo) ; method '*' means any
+    private Map<String, Map<String, MappingInfo>> urlMappings;
     private List<PatternEntry> patternMappings;   // template-based matches
     private boolean initialized;
     
@@ -27,12 +30,12 @@ public class UrlMappingRegistry {
     }
     
     /**
-     * Construit le registre des URLs à partir des classes scannées
+     * Construit le registre des URLs à partir des classes scannees
      * @param classes Liste des classes avec @Controller
      */
     public void buildRegistry(List<Class<?>> classes) {
         if (initialized) {
-            System.out.println("Registre déjà initialisé.");
+            System.out.println("Registre dejà initialise.");
             return;
         }
         
@@ -44,58 +47,128 @@ public class UrlMappingRegistry {
             Method[] methods = clazz.getDeclaredMethods();
             
             for (Method method : methods) {
-                if (method.isAnnotationPresent(GetMapping.class)) {
-                    GetMapping mapping = method.getAnnotation(GetMapping.class);
-                    String url = mapping.value();
+                if (method.isAnnotationPresent(GetMapping.class) || method.isAnnotationPresent(PostMapping.class) || method.isAnnotationPresent(RequestMapping.class)) {
+                    String url = null;
+                    if (method.isAnnotationPresent(GetMapping.class)) {
+                        GetMapping mapping = method.getAnnotation(GetMapping.class);
+                        url = mapping.value();
+                    } else if (method.isAnnotationPresent(PostMapping.class)) {
+                        PostMapping mapping = method.getAnnotation(PostMapping.class);
+                        url = mapping.value();
+                    } else if (method.isAnnotationPresent(RequestMapping.class)) {
+                        RequestMapping mapping = method.getAnnotation(RequestMapping.class);
+                        url = mapping.value();
+                    }
+                    // determine allowed method
+                    String declaredMethod = "*";
+                    if (method.isAnnotationPresent(GetMapping.class)) declaredMethod = "GET";
+                    else if (method.isAnnotationPresent(PostMapping.class)) declaredMethod = "POST";
+                    else if (method.isAnnotationPresent(RequestMapping.class)) {
+                        RequestMapping rm = method.getAnnotation(RequestMapping.class);
+                        if (rm != null && rm.method() != null && !rm.method().trim().isEmpty()) declaredMethod = rm.method().trim().toUpperCase();
+                        else declaredMethod = "*";
+                    }
+
                     if (isTemplate(url)) {
-                        PatternEntry pe = compileTemplate(url, clazz, method);
-                        patternMappings.add(pe);
+                        // Pour les templates, chercher si une PatternEntry existe dejà
+                        PatternEntry existing = findPatternEntry(url);
+                        if (existing != null) {
+                            // Ajouter la methode HTTP à l'entree existante
+                            existing.allowedMethods.add(declaredMethod);
+                            // Si c'est une methode differente, mettre à jour les infos
+                            if (!existing.methods.containsKey(declaredMethod)) {
+                                existing.methods.put(declaredMethod, new MethodInfo(clazz, method));
+                            }
+                        } else {
+                            PatternEntry pe = compileTemplate(url, clazz, method);
+                            pe.allowedMethods.add(declaredMethod);
+                            pe.methods.put(declaredMethod, new MethodInfo(clazz, method));
+                            patternMappings.add(pe);
+                        }
                     } else {
-                        urlMappings.put(url, new MappingInfo(clazz, method, url));
-                        urlCount++;
+                        // CORRECTION: ne pas ecraser, accumuler les methodes HTTP differentes
+                        Map<String, MappingInfo> methodMap = urlMappings.computeIfAbsent(url, k -> new HashMap<>());
+                        
+                        // Verifier si cette combinaison URL+methode existe dejà
+                        if (methodMap.containsKey(declaredMethod)) {
+                            System.out.println("ATTENTION: Mapping duplique ignore: " + declaredMethod + " " + url + 
+                                             " dans " + clazz.getSimpleName() + "." + method.getName());
+                        } else {
+                            methodMap.put(declaredMethod, new MappingInfo(clazz, method, url, declaredMethod));
+                            urlCount++;
+                            System.out.println("Enregistre: " + declaredMethod + " " + url + 
+                                             " -> " + clazz.getSimpleName() + "." + method.getName());
+                        }
                     }
                 }
             }
         }
         
         initialized = true;
-        System.out.println("Registre construit: " + urlCount + " URL(s) mappée(s).\n");
+        System.out.println("\nRegistre construit: " + urlCount + " URL(s) mappee(s).\n");
     }
     
     /**
      * Recherche un mapping par URL
      * @param url L'URL à rechercher
-     * @return MappingInfo ou null si non trouvé
+     * @return MappingInfo ou null si non trouve
      */
-    public MappingInfo findByUrl(String url) {
-        MappingInfo exact = urlMappings.get(url);
-        if (exact != null) return exact;
+    public MappingInfo findByUrl(String url, String httpMethod) {
+        String method = httpMethod == null ? "GET" : httpMethod.toUpperCase();
 
-        // Try pattern mappings
+        // exact match
+        Map<String, MappingInfo> methods = urlMappings.get(url);
+        if (methods != null) {
+            MappingInfo mi = methods.get(method);
+            if (mi != null) return mi;
+            mi = methods.get("*");
+            if (mi != null) return mi;
+            // method not allowed
+            MappingInfo info = new MappingInfo();
+            info.setMethodNotAllowed(methods.keySet());
+            return info;
+        }
+
+        // pattern mappings
+        java.util.Set<String> collectedAllowed = new java.util.HashSet<>();
         for (PatternEntry pe : patternMappings) {
             Matcher m = pe.pattern.matcher(url);
             if (m.matches()) {
-                MappingInfo info = new MappingInfo(pe.controllerClass, pe.method, pe.template);
-                // extract variables by index order
-                for (int i = 0; i < pe.variableNames.size(); i++) {
-                    String value = m.group(i + 1);
-                    info.setPathVariable(pe.variableNames.get(i), value);
+                // if allowed for this method
+                if (pe.allowedMethods.contains(method) || pe.allowedMethods.contains("*")) {
+                    MethodInfo mInfo = pe.methods.get(method);
+                    if (mInfo == null) mInfo = pe.methods.get("*");
+                    if (mInfo != null) {
+                        MappingInfo info = new MappingInfo(mInfo.controllerClass, mInfo.method, pe.template, method);
+                        for (int i = 0; i < pe.variableNames.size(); i++) {
+                            String value = m.group(i + 1);
+                            info.setPathVariable(pe.variableNames.get(i), value);
+                        }
+                        return info;
+                    }
                 }
-                return info;
+                collectedAllowed.addAll(pe.allowedMethods);
             }
         }
+
+        if (!collectedAllowed.isEmpty()) {
+            MappingInfo info = new MappingInfo();
+            info.setMethodNotAllowed(collectedAllowed);
+            return info;
+        }
+
         return null;
     }
     
     /**
-     * Vérifie si le registre est initialisé
+     * Verifie si le registre est initialise
      */
     public boolean isInitialized() {
         return initialized;
     }
     
     /**
-     * Retourne le nombre d'URLs enregistrées
+     * Retourne le nombre d'URLs enregistrees
      */
     public int size() {
         return urlMappings.size();
@@ -104,6 +177,15 @@ public class UrlMappingRegistry {
     // --- Internal helpers for template handling ---
     private boolean isTemplate(String url) {
         return url != null && url.contains("{") && url.contains("}");
+    }
+
+    private PatternEntry findPatternEntry(String template) {
+        for (PatternEntry pe : patternMappings) {
+            if (pe.template.equals(template)) {
+                return pe;
+            }
+        }
+        return null;
     }
 
     private PatternEntry compileTemplate(String template, Class<?> controller, Method method) {
@@ -132,20 +214,28 @@ public class UrlMappingRegistry {
         }
         regex.append('$');
         Pattern pattern = Pattern.compile(regex.toString());
-        return new PatternEntry(template, controller, method, pattern, varNames);
+        return new PatternEntry(template, pattern, varNames);
+    }
+
+    private static class MethodInfo {
+        final Class<?> controllerClass;
+        final Method method;
+
+        MethodInfo(Class<?> controllerClass, Method method) {
+            this.controllerClass = controllerClass;
+            this.method = method;
+        }
     }
 
     private static class PatternEntry {
         final String template;
-        final Class<?> controllerClass;
-        final Method method;
         final Pattern pattern;
         final List<String> variableNames;
+        final java.util.Set<String> allowedMethods = new java.util.HashSet<>();
+        final Map<String, MethodInfo> methods = new HashMap<>();
 
-        PatternEntry(String template, Class<?> controllerClass, Method method, Pattern pattern, List<String> variableNames) {
+        PatternEntry(String template, Pattern pattern, List<String> variableNames) {
             this.template = template;
-            this.controllerClass = controllerClass;
-            this.method = method;
             this.pattern = pattern;
             this.variableNames = variableNames;
         }
