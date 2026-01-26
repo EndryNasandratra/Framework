@@ -11,15 +11,6 @@ import java.util.List;
 
 @Controller
 public class AdminController {
-
-    @GetMapping("/")
-    public ModelAndView home() {
-        ModelAndView mv = new ModelAndView("admin");
-        mv.addObject("title", "Accueil")
-          .addObject("message", "Bienvenue sur l'application")
-          .addObject("count", 0);
-        return mv;
-    }
     
     @GetMapping("/admin/dashboard")
     public String dashboard() {
