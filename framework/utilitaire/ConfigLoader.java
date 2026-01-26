@@ -6,7 +6,7 @@ import java.util.Properties;
 
 /**
  * Responsable du chargement de la configuration depuis config.properties
- * Principe de Responsabilite Unique (SRP)
+ * Principe de Responsabilité Unique (SRP)
  */
 public class ConfigLoader {
     
@@ -30,7 +30,7 @@ public class ConfigLoader {
             input = ConfigLoader.class.getClassLoader().getResourceAsStream("config.properties");
             
             if (input == null) {
-                // Essayer de charger depuis le repertoire testFramework/resources
+                // Essayer de charger depuis le répertoire testFramework/resources
                 input = new FileInputStream("testFramework/resources/config.properties");
             }
             
@@ -39,19 +39,19 @@ public class ConfigLoader {
                 basePackage = props.getProperty("base.package");
                 if (basePackage != null) {
                     basePackage = basePackage.trim();
-                    System.out.println("Package de base charge depuis config.properties: " + basePackage);
+                    System.out.println("Package de base chargé depuis config.properties: " + basePackage);
                 }
                 viewPrefix = propOrDefault(props, "view.prefix", "/WEB-INF/views/");
                 viewSuffix = propOrDefault(props, "view.suffix", ".jsp");
             } else {
                 System.out.println("ERREUR: Fichier config.properties introuvable!");
-                basePackage = "com.testframework"; // Valeur par defaut
+                basePackage = "com.testframework"; // Valeur par défaut
                 viewPrefix = "/WEB-INF/views/";
                 viewSuffix = ".jsp";
             }
         } catch (Exception e) {
             System.out.println("Erreur lors du chargement du config.properties: " + e.getMessage());
-            basePackage = "com.testframework"; // Valeur par defaut
+            basePackage = "com.testframework"; // Valeur par défaut
             viewPrefix = "/WEB-INF/views/";
             viewSuffix = ".jsp";
         } finally {

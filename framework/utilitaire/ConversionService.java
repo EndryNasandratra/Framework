@@ -44,7 +44,7 @@ public class ConversionService {
         if (source == null) return null;
         String raw = source.toString();
         try {
-            // Convention simple: methode statique fromId(String)
+            // Convention simple: méthode statique fromId(String)
             java.lang.reflect.Method m = targetType.getDeclaredMethod("fromId", String.class);
             if (!m.isAccessible()) m.setAccessible(true);
             Object res = m.invoke(null, raw);

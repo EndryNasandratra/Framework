@@ -6,7 +6,7 @@ if not exist "build\classes" mkdir "build\classes"
 
 REM Compilation des annotations
 echo Compilation des annotations...
-javac -d "build\classes" framework\annotation\*.java
+javac --release 17 -d "build\classes" framework\annotation\*.java
 
 if errorlevel 1 (
     echo Erreur de compilation des annotations!
@@ -16,7 +16,13 @@ if errorlevel 1 (
 
 REM Compilation des servlets
 echo Compilation des servlets...
-javac -classpath "jakarta.servlet-api_5.0.0.jar;build\classes" -d "build\classes" framework\servlet\*.java
+REM Compilation des utilitaires
+echo Compilation des utilitaires...
+javac --release 17 -classpath "jakarta.servlet-api_5.0.0.jar;build\classes" -d "build\classes" framework\utilitaire\*.java
+
+REM Compilation des servlets
+echo Compilation des servlets...
+javac --release 17 -classpath "jakarta.servlet-api_5.0.0.jar;build\classes" -d "build\classes" framework\servlet\*.java
 
 if errorlevel 1 (
     echo Erreur de compilation des servlets!
@@ -29,10 +35,18 @@ echo Copie du fichier config.properties...
 copy "testFramework\resources\config.properties" "build\classes\"
 
 REM Compilation des sous-packages de com.testframework
-echo Compilation des sous-packages (controller, util, test, admin)...
+echo Compilation des sous-packages (model, dto, controller, util, test, admin)...
+
+if exist "testFramework\com\testframework\model\*.java" (
+    javac --release 17 -classpath "jakarta.servlet-api_5.0.0.jar;build\classes" -d "build\classes" testFramework\com\testframework\model\*.java
+)
+
+if exist "testFramework\com\testframework\dto\*.java" (
+    javac --release 17 -classpath "jakarta.servlet-api_5.0.0.jar;build\classes" -d "build\classes" testFramework\com\testframework\dto\*.java
+)
 
 if exist "testFramework\com\testframework\controller\*.java" (
-    javac -classpath "build\classes" -d "build\classes" testFramework\com\testframework\controller\*.java
+    javac --release 17 -classpath "jakarta.servlet-api_5.0.0.jar;build\classes" -d "build\classes" testFramework\com\testframework\controller\*.java
     if errorlevel 1 (
         echo Erreur de compilation du package controller!
         pause
@@ -41,20 +55,20 @@ if exist "testFramework\com\testframework\controller\*.java" (
 )
 
 if exist "testFramework\com\testframework\util\*.java" (
-    javac -classpath "build\classes" -d "build\classes" testFramework\com\testframework\util\*.java
+    javac --release 17 -classpath "jakarta.servlet-api_5.0.0.jar;build\classes" -d "build\classes" testFramework\com\testframework\util\*.java
 )
 
 if exist "testFramework\com\testframework\test\*.java" (
-    javac -classpath "build\classes" -d "build\classes" testFramework\com\testframework\test\*.java
+    javac --release 17 -classpath "jakarta.servlet-api_5.0.0.jar;build\classes" -d "build\classes" testFramework\com\testframework\test\*.java
 )
 
 if exist "testFramework\com\testframework\admin\*.java" (
-    javac -classpath "build\classes" -d "build\classes" testFramework\com\testframework\admin\*.java
+    javac --release 17 -classpath "jakarta.servlet-api_5.0.0.jar;build\classes" -d "build\classes" testFramework\com\testframework\admin\*.java
 )
 
 REM Compilation de la classe Main
 echo Compilation de la classe Main...
-javac -classpath "build\classes" -d "build\classes" testFramework\com\testframework\Main.java
+javac --release 17 -classpath "jakarta.servlet-api_5.0.0.jar;build\classes" -d "build\classes" testFramework\com\testframework\Main.java
 
 if errorlevel 1 (
     echo Erreur de compilation de la classe Main!

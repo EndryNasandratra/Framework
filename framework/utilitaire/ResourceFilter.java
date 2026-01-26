@@ -16,7 +16,7 @@ public class ResourceFilter implements Filter {
         String contextPath = httpRequest.getContextPath();
         String resourcePath = requestURI.substring(contextPath.length());
         
-        // Ignorer les URLs de servlets specifiques (comme /testUrl)
+        // Ignorer les URLs de servlets spécifiques (comme /testUrl)
         if (resourcePath.startsWith("/testUrl")) {
             chain.doFilter(request, response);
             return;
