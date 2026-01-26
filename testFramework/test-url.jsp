@@ -24,7 +24,7 @@
 <div class="container">
     <h1>🔍 Test de Mapping d'URLs</h1>
     <div class="info">
-        <strong>Instructions:</strong> Entrez une URL pour rechercher le contrôleur et la methode correspondants.
+        <strong>Instructions:</strong> Entrez une URL pour rechercher le controleur et la methode correspondants.
     </div>
 
     <form action="testUrl" method="post">

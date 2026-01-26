@@ -2,7 +2,7 @@
 echo Nettoyage et redeploiement complet...
 echo.
 
-REM etape 1: Recompiler complètement
+REM etape 1: Recompiler completement
 echo 1. Nettoyage des anciens fichiers...
 if exist "build\classes" rmdir /s /q "build\classes"
 if exist "build\framework.jar" del "build\framework.jar"
@@ -21,7 +21,7 @@ javac -parameters -d "build\classes" framework\annotation\*.java
 
 REM Compiler les utilitaires SANS dependances servlet (MappingInfo avant UrlMappingRegistry)
 javac -parameters -classpath "build\classes" -d "build\classes" framework\utilitaire\MappingInfo.java
-javac -parameters -classpath "build\classes" -d "build\classes" framework\utilitaire\ConfigLoader.java framework\utilitaire\ClassScanner.java framework\utilitaire\UrlMappingRegistry.java framework\utilitaire\MethodInvoker.java framework\utilitaire\ModelAndView.java framework\utilitaire\FormMapper.java framework\utilitaire\ValidationResult.java
+javac -parameters -classpath "build\classes" -d "build\classes" framework\utilitaire\ConfigLoader.java framework\utilitaire\ClassScanner.java framework\utilitaire\UrlMappingRegistry.java framework\utilitaire\MethodInvoker.java framework\utilitaire\ModelAndView.java framework\utilitaire\FormMapper.java framework\utilitaire\ValidationResult.java framework\utilitaire\ConversionService.java framework\utilitaire\ConverterRegistry.java framework\utilitaire\Converter.java framework\utilitaire\ConversionKey.java
 
 REM Compiler le service principal qui depend des utilitaires
 javac -parameters -classpath "build\classes" -d "build\classes" framework\annotation\AnnotationReader.java
@@ -86,10 +86,10 @@ if errorlevel 1 (
 )
 
 echo.
-echo ✅ Redeploiement termine avec succès!
+echo ✅ Redeploiement termine avec succes!
 echo.
 echo INSTRUCTIONS POUR TOMCAT:
-echo 1. Arrêtez Tomcat complètement
+echo 1. Arrêtez Tomcat completement
 echo 2. Supprimez le dossier testFramework de webapps (si il existe)
 echo 3. Supprimez le cache Tomcat: work\Catalina\localhost\testFramework
 echo 4. Copiez le dossier testFramework dans webapps

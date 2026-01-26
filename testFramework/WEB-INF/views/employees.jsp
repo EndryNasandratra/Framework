@@ -29,7 +29,7 @@
                 <th>Prenom</th>
                 <th>Nom</th>
                 <th>Email</th>
-                <th>Rôle</th>
+                <th>Role</th>
             </tr>
         </thead>
         <tbody>

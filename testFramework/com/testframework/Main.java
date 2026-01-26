@@ -7,7 +7,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("=== Demarrage de l'application ===\n");
         
-        // Initialisation du système au demarrage (scan des URLs une seule fois)
+        // Initialisation du systeme au demarrage (scan des URLs une seule fois)
         AnnotationReader.init();
         
         System.out.println("=== Affichage des classes scannees ===\n");

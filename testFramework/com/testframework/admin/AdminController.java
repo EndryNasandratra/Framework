@@ -45,7 +45,7 @@ public class AdminController {
         return mv;
     }
 
-    @GetMapping("/admin/echo-form")
+    @GetMapping("/admin/echo")
     public ModelAndView echoForm() {
         ModelAndView mv = new ModelAndView("echo");
         mv.addObject("title", "Echo Form");

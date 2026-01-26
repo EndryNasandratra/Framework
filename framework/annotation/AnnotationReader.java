@@ -92,7 +92,7 @@ public class AnnotationReader {
     }
     
     /**
-     * Initialise le système en scannant toutes les URLs au demarrage
+     * Initialise le systeme en scannant toutes les URLs au demarrage
      * Coordonne les differents composants: ConfigLoader, ClassScanner, UrlMappingRegistry
      */
     public static void init() {
@@ -101,7 +101,7 @@ public class AnnotationReader {
             return;
         }
         
-        System.out.println("Initialisation du système de mapping d'URLs...");
+        System.out.println("Initialisation du systeme de mapping d'URLs...");
         
         // 1. Charger la configuration
         configLoader.loadConfiguration();

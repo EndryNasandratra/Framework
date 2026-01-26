@@ -17,7 +17,7 @@ public class TestFramework {
     
     @GetMapping("/users")
     public void usersMethod() {
-        // Troisième methode avec annotation @GetMapping
+        // Troisieme methode avec annotation @GetMapping
     }
     
     public void methodWithoutAnnotation() {

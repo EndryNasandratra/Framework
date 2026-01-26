@@ -4,14 +4,17 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Map;
 import framework.annotation.AnnotationReader;
 import framework.annotation.RequestParam;
 import framework.annotation.PathVariable;
+import framework.annotation.ModelAttribute;
 import framework.utilitaire.MappingInfo;
 import framework.utilitaire.ConfigLoader;
 import framework.utilitaire.MethodInvoker;
 import framework.utilitaire.ModelAndView;
+import framework.utilitaire.ConversionService;
 
 public class FrontServlet extends HttpServlet {
 
@@ -62,6 +65,14 @@ public class FrontServlet extends HttpServlet {
                     // Injection of servlet objects
                     if (type == HttpServletRequest.class) { args[i] = req; continue; }
                     if (type == HttpServletResponse.class) { args[i] = resp; continue; }
+
+                    // @ModelAttribute binding (objet complet à partir des parametres du formulaire)
+                    ModelAttribute ma = parameters[i].getAnnotation(ModelAttribute.class);
+                    if (ma != null) {
+                        Object bound = bindModelAttribute(type, req);
+                        args[i] = bound;
+                        continue;
+                    }
 
                     // PathVariable binding
                     PathVariable pv = parameters[i].getAnnotation(PathVariable.class);
@@ -116,7 +127,7 @@ public class FrontServlet extends HttpServlet {
                     ModelAndView mv = (ModelAndView) result;
                     String viewPath = prefix + mv.getViewName() + suffix;
 
-                    // Attacher le modèle sur la requête
+                    // Attacher le modele sur la requête
                     for (Map.Entry<String, Object> entry : mv.getModel().entrySet()) {
                         req.setAttribute(entry.getKey(), entry.getValue());
                     }
@@ -146,7 +157,7 @@ public class FrontServlet extends HttpServlet {
                 e.printStackTrace();
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 resp.setContentType("text/plain; charset=UTF-8");
-                resp.getWriter().println("Erreur lors de l'invocation du contrôleur: " + e.getMessage());
+                resp.getWriter().println("Erreur lors de l'invocation du controleur: " + e.getMessage());
                 return;
             }
         }
@@ -228,6 +239,35 @@ public class FrontServlet extends HttpServlet {
         out.println("<h1>404 - Ressource non trouvee</h1>");
         out.println("<p>La ressource demandee n'a pas ete trouvee.</p>");
         out.println("</body></html>");
+    }
+
+    private Object bindModelAttribute(Class<?> targetType, HttpServletRequest req) {
+        try {
+            Object target = targetType.getDeclaredConstructor().newInstance();
+            java.lang.reflect.Field[] fields = targetType.getDeclaredFields();
+            ConversionService conversionService = ConversionService.getInstance();
+
+            for (java.lang.reflect.Field field : fields) {
+                String name = field.getName();
+                String raw = req.getParameter(name);
+                if (raw == null) {
+                    continue;
+                }
+                Object converted = conversionService.convert(raw, field.getType());
+
+                boolean accessible = field.canAccess(target);
+                if (!accessible) field.setAccessible(true);
+                try {
+                    field.set(target, converted);
+                } finally {
+                    if (!accessible) field.setAccessible(false);
+                }
+            }
+
+            return target;
+        } catch (Throwable t) {
+            throw new RuntimeException("Failed to bind @ModelAttribute for type " + targetType.getName() + ": " + t.getMessage(), t);
+        }
     }
 
     private Object convertSimple(String raw, Class<?> type) {

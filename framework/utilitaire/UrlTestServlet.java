@@ -20,7 +20,7 @@ public class UrlTestServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        // Initialiser le système de mapping au demarrage du servlet
+        // Initialiser le systeme de mapping au demarrage du servlet
         System.out.println("=== Initialisation du servlet de test d'URL ===");
         AnnotationReader.init();
     }
@@ -41,7 +41,7 @@ public class UrlTestServlet extends HttpServlet {
         out.println("<h2>Test d'URL (sans page JSP)</h2>");
 
         if (url == null || url.trim().isEmpty()) {
-            out.println("<p>Indiquez un paramètre <code>url</code> dans la barre d'adresse pour tester un mapping.</p>");
+            out.println("<p>Indiquez un parametre <code>url</code> dans la barre d'adresse pour tester un mapping.</p>");
             out.println("<p>Exemple: <code>" + request.getContextPath() + "/testUrl?url=/hello</code></p>");
             out.println("</body></html>");
             return;
