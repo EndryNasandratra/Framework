@@ -19,9 +19,11 @@ public class EmployeController {
 
     @PostMapping("/employe/save")
     public ModelAndView save(@ModelAttribute EmployeDTO employe) {
-        System.out.println("Employe: " + employe.getNom());
+        //Employee emp= new  Employee();
+        //emp.setNom(employe.getNom());
+        System.out.println("Employé: " + employe.getNom());
         if (employe.getDept() != null) {
-            System.out.println("Departement: " + employe.getDept().getNomDept());
+            System.out.println("Département: " + employe.getDept().getNomDept());
         }
         if (employe.getLieu() != null) {
             System.out.println("Lieu: " + employe.getLieu().getVille());
@@ -29,7 +31,7 @@ public class EmployeController {
 
         ModelAndView mv = new ModelAndView("employe-form");
         mv.addObject("employe", employe);
-        mv.addObject("message", "Employe sauvegarde (voir console serveur).");
+        mv.addObject("message", "Employé sauvegardé (voir console serveur).");
         return mv;
     }
 }
