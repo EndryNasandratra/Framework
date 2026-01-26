@@ -17,7 +17,7 @@
 <body>
 <div class="card">
     <h1><%= String.valueOf(request.getAttribute("title")) %></h1>
-    <form method="get" action="<%= request.getContextPath() %>/admin/echo">
+    <form method="post" action="<%= request.getContextPath() %>/admin/echo">
         <div class="row">
             <label for="msg">Message</label>
             <input type="text" id="msg" name="msg" placeholder="Hello" required>

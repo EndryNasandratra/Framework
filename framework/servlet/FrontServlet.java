@@ -4,14 +4,17 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Map;
 import framework.annotation.AnnotationReader;
 import framework.annotation.RequestParam;
 import framework.annotation.PathVariable;
+import framework.annotation.ModelAttribute;
 import framework.utilitaire.MappingInfo;
 import framework.utilitaire.ConfigLoader;
 import framework.utilitaire.MethodInvoker;
 import framework.utilitaire.ModelAndView;
+import framework.utilitaire.ConversionService;
 
 public class FrontServlet extends HttpServlet {
 
@@ -23,10 +26,10 @@ public class FrontServlet extends HttpServlet {
         String contextPath = req.getContextPath();
         String resourcePath = urlPath.startsWith(contextPath) ? urlPath.substring(contextPath.length()) : urlPath;
 
-        // Initialiser l'annotation/mapping si necessaire
+        // Initialiser l'annotation/mapping si nécessaire
         AnnotationReader.init();
 
-        // Essayer de retrouver un mapping pour la ressource demandee
+        // Essayer de retrouver un mapping pour la ressource demandée
         MappingInfo mapping = AnnotationReader.findMappingByUrl(resourcePath, req.getMethod());
         if (mapping == null) mapping = new MappingInfo();
 
@@ -62,6 +65,14 @@ public class FrontServlet extends HttpServlet {
                     // Injection of servlet objects
                     if (type == HttpServletRequest.class) { args[i] = req; continue; }
                     if (type == HttpServletResponse.class) { args[i] = resp; continue; }
+
+                    // @ModelAttribute binding (objet complet à partir des paramètres du formulaire)
+                    ModelAttribute ma = parameters[i].getAnnotation(ModelAttribute.class);
+                    if (ma != null) {
+                        Object bound = bindModelAttribute(type, req);
+                        args[i] = bound;
+                        continue;
+                    }
 
                     // PathVariable binding
                     PathVariable pv = parameters[i].getAnnotation(PathVariable.class);
@@ -108,7 +119,7 @@ public class FrontServlet extends HttpServlet {
 
                 Object result = method.invoke(instance, args);
 
-                // Si la methode retourne un ModelAndView, forward vers la vue
+                // Si la méthode retourne un ModelAndView, forward vers la vue
                 if (result instanceof ModelAndView) {
                     ConfigLoader cfg = new ConfigLoader();
                     String prefix = cfg.getViewPrefix();
@@ -129,15 +140,15 @@ public class FrontServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.setContentType("text/html; charset=UTF-8");
                 PrintWriter out = resp.getWriter();
-                out.println("<html><head><meta charset='UTF-8'><title>Resultat</title>"
+                out.println("<html><head><meta charset='UTF-8'><title>Résultat</title>"
                         + "<style>body{font-family:Arial, sans-serif;padding:24px} code{background:#f5f5f5;padding:2px 4px;border-radius:4px}</style>"
                         + "</head><body>");
-                out.println("<h2>Mapping trouve</h2>");
+                out.println("<h2>Mapping trouvé</h2>");
                 out.println("<ul>");
                 out.println("  <li>Classe: <code>" + controller.getSimpleName() + "</code></li>");
-                out.println("  <li>Methode: <code>" + mapping.getMethod().getName() + "</code></li>");
+                out.println("  <li>Méthode: <code>" + mapping.getMethod().getName() + "</code></li>");
                 out.println("</ul>");
-                out.println("<h3>Resultat</h3>");
+                out.println("<h3>Résultat</h3>");
                 out.println("<div>" + String.valueOf(result) + "</div>");
                 out.println("</body></html>");
                 return;
@@ -169,7 +180,7 @@ public class FrontServlet extends HttpServlet {
                     Object instance = controllerClazz.getDeclaredConstructor().newInstance();
                     Object result = MethodInvoker.execute(instance, methodName, new Class[] {}, new Object[] {});
 
-                    // Gestion ModelAndView en conventionnel egalement
+                    // Gestion ModelAndView en conventionnel également
                     if (result instanceof ModelAndView) {
                         ConfigLoader cfg = new ConfigLoader();
                         String prefix = cfg.getViewPrefix();
@@ -189,15 +200,15 @@ public class FrontServlet extends HttpServlet {
                     resp.setStatus(HttpServletResponse.SC_OK);
                     resp.setContentType("text/html; charset=UTF-8");
                     PrintWriter out = resp.getWriter();
-                    out.println("<html><head><meta charset='UTF-8'><title>Resultat</title>"
+                    out.println("<html><head><meta charset='UTF-8'><title>Résultat</title>"
                             + "<style>body{font-family:Arial, sans-serif;padding:24px} code{background:#f5f5f5;padding:2px 4px;border-radius:4px}</style>"
                             + "</head><body>");
                     out.println("<h2>Convention mapping</h2>");
                     out.println("<ul>");
                     out.println("  <li>Classe: <code>" + controllerClazz.getSimpleName() + "</code></li>");
-                    out.println("  <li>Methode: <code>" + methodName + "</code></li>");
+                    out.println("  <li>Méthode: <code>" + methodName + "</code></li>");
                     out.println("</ul>");
-                    out.println("<h3>Resultat</h3>");
+                    out.println("<h3>Résultat</h3>");
                     out.println("<div>" + String.valueOf(result) + "</div>");
                     out.println("</body></html>");
                     return;
@@ -206,28 +217,57 @@ public class FrontServlet extends HttpServlet {
         } catch (ClassNotFoundException e) {
             // Ignorer, on tombera en 404
         } catch (NoSuchMethodException e) {
-            // Methode non trouvee -> 404
+            // Méthode non trouvée -> 404
         } catch (RuntimeException e) {
-            // Erreur d'invocation (ex: methode inexistante) -> considerer comme non trouve et tomber en 404
+            // Erreur d'invocation (ex: méthode inexistante) -> considérer comme non trouvé et tomber en 404
         } catch (Throwable t) {
             t.printStackTrace();
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.setContentType("text/plain; charset=UTF-8");
-            resp.getWriter().println("Erreur lors de la resolution conventionnelle: " + t.getMessage());
+            resp.getWriter().println("Erreur lors de la résolution conventionnelle: " + t.getMessage());
             return;
         }
 
         // Toujours rien: renvoyer un 404 propre
-        System.out.println("FrontServlet: aucun mapping trouve pour " + resourcePath);
+        System.out.println("FrontServlet: aucun mapping trouvé pour " + resourcePath);
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         resp.setContentType("text/html; charset=UTF-8");
         PrintWriter out = resp.getWriter();
-        out.println("<html><head><meta charset='UTF-8'><title>404 - Non trouve</title>"
+        out.println("<html><head><meta charset='UTF-8'><title>404 - Non trouvé</title>"
                 + "<style>body{font-family:Arial, sans-serif;padding:32px;color:#333} h1{color:#b00020}</style>"
                 + "</head><body>");
-        out.println("<h1>404 - Ressource non trouvee</h1>");
-        out.println("<p>La ressource demandee n'a pas ete trouvee.</p>");
+        out.println("<h1>404 - Ressource non trouvée</h1>");
+        out.println("<p>La ressource demandée n'a pas été trouvée.</p>");
         out.println("</body></html>");
+    }
+
+    private Object bindModelAttribute(Class<?> targetType, HttpServletRequest req) {
+        try {
+            Object target = targetType.getDeclaredConstructor().newInstance();
+            java.lang.reflect.Field[] fields = targetType.getDeclaredFields();
+            ConversionService conversionService = ConversionService.getInstance();
+
+            for (java.lang.reflect.Field field : fields) {
+                String name = field.getName();
+                String raw = req.getParameter(name);
+                if (raw == null) {
+                    continue;
+                }
+                Object converted = conversionService.convert(raw, field.getType());
+
+                boolean accessible = field.canAccess(target);
+                if (!accessible) field.setAccessible(true);
+                try {
+                    field.set(target, converted);
+                } finally {
+                    if (!accessible) field.setAccessible(false);
+                }
+            }
+
+            return target;
+        } catch (Throwable t) {
+            throw new RuntimeException("Failed to bind @ModelAttribute for type " + targetType.getName() + ": " + t.getMessage(), t);
+        }
     }
 
     private Object convertSimple(String raw, Class<?> type) {

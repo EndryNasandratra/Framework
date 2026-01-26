@@ -5,13 +5,13 @@ import framework.annotation.AnnotationReader;
 public class Main {
     
     public static void main(String[] args) {
-        System.out.println("=== Demarrage de l'application ===\n");
+        System.out.println("=== Démarrage de l'application ===\n");
         
-        // Initialisation du système au demarrage (scan des URLs une seule fois)
+        // Initialisation du système au démarrage (scan des URLs une seule fois)
         AnnotationReader.init();
         
-        System.out.println("=== Affichage des classes scannees ===\n");
-        // Le package de base est defini dans testFramework/resources/config.properties
+        System.out.println("=== Affichage des classes scannées ===\n");
+        // Le package de base est défini dans testFramework/resources/config.properties
         AnnotationReader.displayClassesWithAnnotations();
         
         System.out.println("\n=== Test de recherche d'URL ===\n");
