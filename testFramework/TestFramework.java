@@ -7,21 +7,21 @@ public class TestFramework {
     
     @GetMapping("/index")
     public void indexMethod() {
-        // Methode avec annotation @GetMapping
+        // Méthode avec annotation @GetMapping
     }
     
     @GetMapping("/home")
     public void homeMethod() {
-        // Autre methode avec annotation @GetMapping
+        // Autre méthode avec annotation @GetMapping
     }
     
     @GetMapping("/users")
     public void usersMethod() {
-        // Troisieme methode avec annotation @GetMapping
+        // Troisième méthode avec annotation @GetMapping
     }
     
     public void methodWithoutAnnotation() {
-        // Methode sans annotation
+        // Méthode sans annotation
     }
     
     public static void main(String[] args) {

@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Formulaire Employe</title>
+    <title>Formulaire Employé</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 32px; }
         .field { margin-bottom: 12px; }
@@ -13,7 +13,7 @@
     </style>
 </head>
 <body>
-<h1>Formulaire Employe</h1>
+<h1>Formulaire Employé</h1>
 
 <%
     testFramework.com.testframework.model.EmployeDTO employe = (testFramework.com.testframework.model.EmployeDTO) request.getAttribute("employe");
@@ -39,9 +39,9 @@
     </div>
 
     <div class="field">
-        <label for="dept">Departement:</label>
+        <label for="dept">Département:</label>
         <select id="dept" name="dept">
-            <option value="">-- Selectionner --</option>
+            <option value="">-- Sélectionner --</option>
             <option value="1" <%= (employe.getDept() != null && employe.getDept().getId() != null && employe.getDept().getId() == 1L) ? "selected" : "" %>>Informatique</option>
             <option value="2" <%= (employe.getDept() != null && employe.getDept().getId() != null && employe.getDept().getId() == 2L) ? "selected" : "" %>>Ressources Humaines</option>
             <option value="3" <%= (employe.getDept() != null && employe.getDept().getId() != null && employe.getDept().getId() == 3L) ? "selected" : "" %>>Marketing</option>
@@ -51,7 +51,7 @@
     <div class="field">
         <label for="lieu">Lieu:</label>
         <select id="lieu" name="lieu">
-            <option value="">-- Selectionner --</option>
+            <option value="">-- Sélectionner --</option>
             <option value="1" <%= (employe.getLieu() != null && employe.getLieu().getId() != null && employe.getLieu().getId() == 1L) ? "selected" : "" %>>Paris, France</option>
             <option value="2" <%= (employe.getLieu() != null && employe.getLieu().getId() != null && employe.getLieu().getId() == 2L) ? "selected" : "" %>>Lyon, France</option>
             <option value="3" <%= (employe.getLieu() != null && employe.getLieu().getId() != null && employe.getLieu().getId() == 3L) ? "selected" : "" %>>Marseille, France</option>

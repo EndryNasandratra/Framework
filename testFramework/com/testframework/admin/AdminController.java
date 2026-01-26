@@ -11,6 +11,15 @@ import java.util.List;
 
 @Controller
 public class AdminController {
+
+    @GetMapping("/")
+    public ModelAndView home() {
+        ModelAndView mv = new ModelAndView("admin");
+        mv.addObject("title", "Accueil")
+          .addObject("message", "Bienvenue sur l'application")
+          .addObject("count", 0);
+        return mv;
+    }
     
     @GetMapping("/admin/dashboard")
     public String dashboard() {
@@ -24,7 +33,7 @@ public class AdminController {
 
     @GetMapping("/admin/page")
     public ModelAndView page() {
-        // Restituer la vue "admin" -> resolu en /WEB-INF/views/admin.jsp (via view.prefix/suffix)
+        // Restituer la vue "admin" -> résolu en /WEB-INF/views/admin.jsp (via view.prefix/suffix)
         ModelAndView mv = new ModelAndView("admin");
         mv.addObject("title", "Tableau de bord Admin")
           .addObject("message", "Bienvenue sur la page admin rendue via JSP")
@@ -41,7 +50,7 @@ public class AdminController {
         );
         ModelAndView mv = new ModelAndView("employees");
         mv.addObject("employees", list)
-          .addObject("title", "Liste des employes");
+          .addObject("title", "Liste des employés");
         return mv;
     }
 
