@@ -13,8 +13,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Responsable de la gestion du registre des mappings URL -> Classe/Methode
- * Principe de Responsabilite Unique (SRP)
+ * Responsable de la gestion du registre des mappings URL -> Classe/Méthode
+ * Principe de Responsabilité Unique (SRP)
  */
 public class UrlMappingRegistry {
     
@@ -30,12 +30,12 @@ public class UrlMappingRegistry {
     }
     
     /**
-     * Construit le registre des URLs à partir des classes scannees
+     * Construit le registre des URLs à partir des classes scannées
      * @param classes Liste des classes avec @Controller
      */
     public void buildRegistry(List<Class<?>> classes) {
         if (initialized) {
-            System.out.println("Registre dejà initialise.");
+            System.out.println("Registre déjà initialisé.");
             return;
         }
         
@@ -46,19 +46,34 @@ public class UrlMappingRegistry {
         for (Class<?> clazz : classes) {
             Method[] methods = clazz.getDeclaredMethods();
             
+            // Vérifier si la classe a un @RequestMapping global
+            String baseUrl = "";
+            if (clazz.isAnnotationPresent(RequestMapping.class)) {
+                baseUrl = clazz.getAnnotation(RequestMapping.class).value();
+                if (baseUrl.endsWith("/")) {
+                    baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+                }
+            }
+
             for (Method method : methods) {
                 if (method.isAnnotationPresent(GetMapping.class) || method.isAnnotationPresent(PostMapping.class) || method.isAnnotationPresent(RequestMapping.class)) {
-                    String url = null;
+                    String urlPart = null;
                     if (method.isAnnotationPresent(GetMapping.class)) {
                         GetMapping mapping = method.getAnnotation(GetMapping.class);
-                        url = mapping.value();
+                        urlPart = mapping.value();
                     } else if (method.isAnnotationPresent(PostMapping.class)) {
                         PostMapping mapping = method.getAnnotation(PostMapping.class);
-                        url = mapping.value();
+                        urlPart = mapping.value();
                     } else if (method.isAnnotationPresent(RequestMapping.class)) {
                         RequestMapping mapping = method.getAnnotation(RequestMapping.class);
-                        url = mapping.value();
+                        urlPart = mapping.value();
                     }
+                    
+                    // Combiner baseUrl et urlPart
+                    if (urlPart != null) {
+                        if (!urlPart.startsWith("/")) urlPart = "/" + urlPart;
+                        String url = baseUrl + urlPart;
+
                     // determine allowed method
                     String declaredMethod = "*";
                     if (method.isAnnotationPresent(GetMapping.class)) declaredMethod = "GET";
@@ -70,12 +85,12 @@ public class UrlMappingRegistry {
                     }
 
                     if (isTemplate(url)) {
-                        // Pour les templates, chercher si une PatternEntry existe dejà
+                        // Pour les templates, chercher si une PatternEntry existe déjà
                         PatternEntry existing = findPatternEntry(url);
                         if (existing != null) {
-                            // Ajouter la methode HTTP à l'entree existante
+                            // Ajouter la méthode HTTP à l'entrée existante
                             existing.allowedMethods.add(declaredMethod);
-                            // Si c'est une methode differente, mettre à jour les infos
+                            // Si c'est une méthode différente, mettre à jour les infos
                             if (!existing.methods.containsKey(declaredMethod)) {
                                 existing.methods.put(declaredMethod, new MethodInfo(clazz, method));
                             }
@@ -86,18 +101,19 @@ public class UrlMappingRegistry {
                             patternMappings.add(pe);
                         }
                     } else {
-                        // CORRECTION: ne pas ecraser, accumuler les methodes HTTP differentes
+                        // CORRECTION: ne pas écraser, accumuler les méthodes HTTP différentes
                         Map<String, MappingInfo> methodMap = urlMappings.computeIfAbsent(url, k -> new HashMap<>());
                         
-                        // Verifier si cette combinaison URL+methode existe dejà
+                        // Vérifier si cette combinaison URL+méthode existe déjà
                         if (methodMap.containsKey(declaredMethod)) {
-                            System.out.println("ATTENTION: Mapping duplique ignore: " + declaredMethod + " " + url + 
+                            System.out.println("ATTENTION: Mapping dupliqué ignoré: " + declaredMethod + " " + url + 
                                              " dans " + clazz.getSimpleName() + "." + method.getName());
                         } else {
                             methodMap.put(declaredMethod, new MappingInfo(clazz, method, url, declaredMethod));
                             urlCount++;
-                            System.out.println("Enregistre: " + declaredMethod + " " + url + 
+                            System.out.println("Enregistré: " + declaredMethod + " " + url + 
                                              " -> " + clazz.getSimpleName() + "." + method.getName());
+                        }
                         }
                     }
                 }
@@ -105,13 +121,13 @@ public class UrlMappingRegistry {
         }
         
         initialized = true;
-        System.out.println("\nRegistre construit: " + urlCount + " URL(s) mappee(s).\n");
+        System.out.println("\nRegistre construit: " + urlCount + " URL(s) mappée(s).\n");
     }
     
     /**
      * Recherche un mapping par URL
      * @param url L'URL à rechercher
-     * @return MappingInfo ou null si non trouve
+     * @return MappingInfo ou null si non trouvé
      */
     public MappingInfo findByUrl(String url, String httpMethod) {
         String method = httpMethod == null ? "GET" : httpMethod.toUpperCase();
@@ -161,14 +177,14 @@ public class UrlMappingRegistry {
     }
     
     /**
-     * Verifie si le registre est initialise
+     * Vérifie si le registre est initialisé
      */
     public boolean isInitialized() {
         return initialized;
     }
     
     /**
-     * Retourne le nombre d'URLs enregistrees
+     * Retourne le nombre d'URLs enregistrées
      */
     public int size() {
         return urlMappings.size();

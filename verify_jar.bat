@@ -2,7 +2,7 @@
 echo Verification du contenu du JAR framework...
 echo.
 
-REM Verifier si le JAR existe
+REM Vérifier si le JAR existe
 if not exist "testFramework\WEB-INF\lib\framework.jar" (
     echo ERREUR: Le fichier framework.jar n'existe pas dans testFramework\WEB-INF\lib\
     pause
