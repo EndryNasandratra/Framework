@@ -5,10 +5,6 @@ public class EmployeDTO {
     private Integer age;
     private Departement dept;
     private Lieu lieu;
-     protected String ETU;
-    public void setETU(String ETU ){
-        this.ETU=ETU;
-    }
 
     public String getNom() {
         return nom;
