@@ -20,16 +20,16 @@
     List<Employee> employees = (List<Employee>) request.getAttribute("employees");
 %>
 <% if (employees == null || employees.isEmpty()) { %>
-    <p class="muted">Aucun employé.</p>
+    <p class="muted">Aucun employe.</p>
 <% } else { %>
     <table>
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Prénom</th>
+                <th>Prenom</th>
                 <th>Nom</th>
                 <th>Email</th>
-                <th>Rôle</th>
+                <th>Role</th>
             </tr>
         </thead>
         <tbody>

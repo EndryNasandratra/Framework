@@ -24,7 +24,7 @@ public class AdminController {
 
     @GetMapping("/admin/page")
     public ModelAndView page() {
-        // Restituer la vue "admin" -> résolu en /WEB-INF/views/admin.jsp (via view.prefix/suffix)
+        // Restituer la vue "admin" -> resolu en /WEB-INF/views/admin.jsp (via view.prefix/suffix)
         ModelAndView mv = new ModelAndView("admin");
         mv.addObject("title", "Tableau de bord Admin")
           .addObject("message", "Bienvenue sur la page admin rendue via JSP")
@@ -41,7 +41,7 @@ public class AdminController {
         );
         ModelAndView mv = new ModelAndView("employees");
         mv.addObject("employees", list)
-          .addObject("title", "Liste des employés");
+          .addObject("title", "Liste des employes");
         return mv;
     }
 

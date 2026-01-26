@@ -57,7 +57,7 @@ public class FormMappingTest {
         UserController controller = new UserController();
         UserForm user = controller.handleRegistration(formData);
 
-        System.out.println("=== Test de contrôleur ===");
+        System.out.println("=== Test de controleur ===");
         System.out.println("isValid=" + user.isValid());
         System.out.println("username=" + user.getUsername());
         System.out.println("email=" + user.getEmail());

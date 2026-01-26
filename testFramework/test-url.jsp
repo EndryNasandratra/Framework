@@ -24,7 +24,7 @@
 <div class="container">
     <h1>🔍 Test de Mapping d'URLs</h1>
     <div class="info">
-        <strong>Instructions:</strong> Entrez une URL pour rechercher le contrôleur et la méthode correspondants.
+        <strong>Instructions:</strong> Entrez une URL pour rechercher le controleur et la methode correspondants.
     </div>
 
     <form action="testUrl" method="post">
@@ -44,13 +44,13 @@
         if (result != null) {
     %>
     <div class="result <%= (found != null && found) ? "success" : "error" %>">
-        <h3><%= (found != null && found) ? "✅ URL Trouvée" : "❌ 404 - URL Non Trouvée" %></h3>
-        <p><strong>URL recherchée:</strong> <%= searchUrl %></p>
+        <h3><%= (found != null && found) ? "✅ URL Trouvee" : "❌ 404 - URL Non Trouvee" %></h3>
+        <p><strong>URL recherchee:</strong> <%= searchUrl %></p>
         <% if (found != null && found) { %>
             <p><strong>Classe:</strong> <%= className %></p>
-            <p><strong>Méthode:</strong> <%= methodName %></p>
+            <p><strong>Methode:</strong> <%= methodName %></p>
         <% } else { %>
-            <p>Aucun mapping trouvé pour cette URL.</p>
+            <p>Aucun mapping trouve pour cette URL.</p>
         <% } %>
     </div>
     <% } %>

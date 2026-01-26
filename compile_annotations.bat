@@ -1,7 +1,7 @@
 @echo off
 echo Compilation des annotations et du test...
 
-REM Créer les répertoires de build s'ils n'existent pas
+REM Creer les repertoires de build s'ils n'existent pas
 if not exist "build\classes" mkdir "build\classes"
 
 REM Compilation des annotations
@@ -62,7 +62,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo Compilation réussie!
+echo Compilation reussie!
 echo.
 echo Pour tester les annotations:
 echo java -cp "build\classes" testFramework.com.testframework.Main

@@ -20,7 +20,7 @@ public class UrlTestServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        // Initialiser le système de mapping au démarrage du servlet
+        // Initialiser le systeme de mapping au demarrage du servlet
         System.out.println("=== Initialisation du servlet de test d'URL ===");
         AnnotationReader.init();
     }
@@ -41,7 +41,7 @@ public class UrlTestServlet extends HttpServlet {
         out.println("<h2>Test d'URL (sans page JSP)</h2>");
 
         if (url == null || url.trim().isEmpty()) {
-            out.println("<p>Indiquez un paramètre <code>url</code> dans la barre d'adresse pour tester un mapping.</p>");
+            out.println("<p>Indiquez un parametre <code>url</code> dans la barre d'adresse pour tester un mapping.</p>");
             out.println("<p>Exemple: <code>" + request.getContextPath() + "/testUrl?url=/hello</code></p>");
             out.println("</body></html>");
             return;
@@ -51,13 +51,13 @@ public class UrlTestServlet extends HttpServlet {
 
         out.println("<p>Recherche du mapping pour: <code>" + url + "</code></p>");
         if (mapping.isFound()) {
-            out.println("<p class='ok'><strong>Trouvé</strong></p>");
+            out.println("<p class='ok'><strong>Trouve</strong></p>");
             out.println("<ul>");
             out.println("  <li>Classe: <code>" + mapping.getClassName() + "</code></li>");
-            out.println("  <li>Méthode: <code>" + mapping.getMethodName() + "</code></li>");
+            out.println("  <li>Methode: <code>" + mapping.getMethodName() + "</code></li>");
             out.println("</ul>");
         } else {
-            out.println("<p class='ko'><strong>Aucun mapping trouvé</strong></p>");
+            out.println("<p class='ko'><strong>Aucun mapping trouve</strong></p>");
         }
 
         out.println("</body></html>");
@@ -66,7 +66,7 @@ public class UrlTestServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        // Support POST en délégant au GET (même logique de réponse directe)
+        // Support POST en delegant au GET (même logique de reponse directe)
         doGet(request, response);
     }
 }

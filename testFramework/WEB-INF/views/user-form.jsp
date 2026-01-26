@@ -36,7 +36,7 @@
 %>
 
 <% if (valid != null && valid) { %>
-    <div class="success">Utilisateur validé avec succès !</div>
+    <div class="success">Utilisateur valide avec succes !</div>
 <% } %>
 
 <form method="post" action="<%= request.getContextPath() %>/users/register">
