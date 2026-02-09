@@ -74,6 +74,8 @@ public class ClassScanner {
                     System.out.println("Impossible de charger la classe: " + packageName + "." + className);
                 } catch (NoClassDefFoundError e) {
                     // Ignorer les erreurs de classes internes ou dépendances manquantes
+                } catch (UnsupportedClassVersionError e) {
+                    System.out.println("Version de classe incompatible (ignorée): " + packageName + "." + className + " - " + e.getMessage());
                 }
             }
         }
