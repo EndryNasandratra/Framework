@@ -7,7 +7,6 @@ echo 1. Nettoyage des anciens fichiers...
 if exist "build\classes" rmdir /s /q "build\classes"
 if exist "build\framework.jar" del "build\framework.jar"
 if exist "testFramework\WEB-INF\lib\framework.jar" del "testFramework\WEB-INF\lib\framework.jar"
-if exist "testFramework\WEB-INF\classes" rmdir /s /q "testFramework\WEB-INF\classes"
 
 REM Étape 2: Créer les répertoires
 echo 2. Création des répertoires...
@@ -18,17 +17,18 @@ REM Étape 3: Compilation
 echo 3. Compilation des sources du framework...
 
 REM Compiler toutes les annotations
-javac -parameters --release 17 -d "build\classes" framework\annotation\*.java
+javac -parameters -d "build\classes" framework\annotation\*.java
 
 REM Compiler les utilitaires SANS dépendances servlet (MappingInfo avant UrlMappingRegistry)
-javac -parameters --release 17 -classpath "build\classes" -d "build\classes" framework\utilitaire\MappingInfo.java
-javac -parameters --release 17 -classpath "build\classes" -d "build\classes" framework\utilitaire\ConfigLoader.java framework\utilitaire\ClassScanner.java framework\utilitaire\UrlMappingRegistry.java framework\utilitaire\MethodInvoker.java framework\utilitaire\ModelAndView.java framework\utilitaire\FormMapper.java framework\utilitaire\ValidationResult.java framework\utilitaire\ConversionService.java framework\utilitaire\ConverterRegistry.java framework\utilitaire\Converter.java framework\utilitaire\ConversionKey.java framework\utilitaire\JsonSerializer.java
+javac -parameters -classpath "build\classes" -d "build\classes" framework\utilitaire\MappingInfo.java
+javac -parameters -classpath "build\classes" -d "build\classes" framework\utilitaire\ConfigLoader.java framework\utilitaire\ClassScanner.java framework\utilitaire\UrlMappingRegistry.java framework\utilitaire\MethodInvoker.java framework\utilitaire\ModelAndView.java framework\utilitaire\FormMapper.java framework\utilitaire\ValidationResult.java framework\utilitaire\ConversionService.java framework\utilitaire\ConverterRegistry.java framework\utilitaire\Converter.java framework\utilitaire\ConversionKey.java framework\utilitaire\JsonSerializer.java
 
 REM Compiler les classes HTTP (ex: MultipartFile)
-javac -parameters --release 17 -classpath "build\classes;jakarta.servlet-api_5.0.0.jar" -d "build\classes" framework\http\*.java
+javac -parameters -classpath "build\classes;jakarta.servlet-api_5.0.0.jar" -d "build\classes" framework\http\*.java
+javac -parameters -classpath "build\classes;jakarta.servlet-api_5.0.0.jar" -d "build\classes" framework\session\*.java
 
 REM Compiler le service principal qui dépend des utilitaires
-javac -parameters --release 17 -classpath "build\classes" -d "build\classes" framework\annotation\AnnotationReader.java
+javac -parameters -classpath "build\classes" -d "build\classes" framework\annotation\AnnotationReader.java
 
 if errorlevel 1 (
     echo ERREUR: Échec de la compilation des annotations/utilitaires!
@@ -38,7 +38,7 @@ if errorlevel 1 (
 
 REM Compiler les servlets (dépendent de jakarta.servlet-api_5.0.0.jar)
 echo Compilation des servlets...
-javac -parameters --release 17 -classpath "jakarta.servlet-api_5.0.0.jar;build\classes" -d "build\classes" framework\servlet\*.java framework\utilitaire\ResourceFilter.java framework\utilitaire\UrlTestServlet.java
+javac -parameters -classpath "jakarta.servlet-api_5.0.0.jar;build\classes" -d "build\classes" framework\servlet\*.java framework\utilitaire\ResourceFilter.java framework\utilitaire\UrlTestServlet.java
 
 if errorlevel 1 (
     echo ERREUR: Échec de la compilation des servlets!
@@ -53,15 +53,15 @@ if not exist "testFramework\WEB-INF\classes" mkdir "testFramework\WEB-INF\classe
 REM Copier config.properties
 copy "testFramework\resources\config.properties" "testFramework\WEB-INF\classes\"
 
-REM Compiler toutes les classes test (model, controller, admin, util, dto)
-for %%D in (model controller admin util dto) do (
+REM Compiler toutes les classes test (model, controller, admin, util)
+for %%D in (model controller admin util) do (
     if exist "testFramework\com\testframework\%%D" (
-        javac -parameters --release 17 -classpath "jakarta.servlet-api_5.0.0.jar;build\classes;testFramework\WEB-INF\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\%%D\*.java
+        javac -parameters -classpath "jakarta.servlet-api_5.0.0.jar;build\classes;testFramework\WEB-INF\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\%%D\*.java
     )
 )
 
 REM Compiler la classe principale
-javac -parameters --release 17 -classpath "jakarta.servlet-api_5.0.0.jar;build\classes;testFramework\WEB-INF\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\Main.java
+javac -parameters -classpath "jakarta.servlet-api_5.0.0.jar;build\classes;testFramework\WEB-INF\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\Main.java
 
 if errorlevel 1 (
     echo ERREUR: Échec de la compilation des classes de test!
