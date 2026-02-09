@@ -6,8 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a controller method (or class) as requiring authentication.
- * Optional value can specify a required role (e.g. "admin").
+ * Annotation pour sécuriser un contrôleur ou une méthode.
+ * Si présente, l'utilisateur doit être authentifié.
+ * Si une valeur est spécifiée, l'utilisateur doit avoir ce rôle.
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
