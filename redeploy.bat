@@ -17,18 +17,18 @@ REM Étape 3: Compilation
 echo 3. Compilation des sources du framework...
 
 REM Compiler toutes les annotations
-javac -parameters -d "build\classes" framework\annotation\*.java
+javac --release 17 -parameters -d "build\classes" framework\annotation\*.java
 
 REM Compiler les utilitaires SANS dépendances servlet (MappingInfo avant UrlMappingRegistry)
-javac -parameters -classpath "build\classes" -d "build\classes" framework\utilitaire\MappingInfo.java
-javac -parameters -classpath "build\classes" -d "build\classes" framework\utilitaire\ConfigLoader.java framework\utilitaire\ClassScanner.java framework\utilitaire\UrlMappingRegistry.java framework\utilitaire\MethodInvoker.java framework\utilitaire\ModelAndView.java framework\utilitaire\FormMapper.java framework\utilitaire\ValidationResult.java framework\utilitaire\ConversionService.java framework\utilitaire\ConverterRegistry.java framework\utilitaire\Converter.java framework\utilitaire\ConversionKey.java framework\utilitaire\JsonSerializer.java
+javac --release 17 -parameters -classpath "build\classes" -d "build\classes" framework\utilitaire\MappingInfo.java
+javac --release 17 -parameters -classpath "build\classes" -d "build\classes" framework\utilitaire\ConfigLoader.java framework\utilitaire\ClassScanner.java framework\utilitaire\UrlMappingRegistry.java framework\utilitaire\MethodInvoker.java framework\utilitaire\ModelAndView.java framework\utilitaire\FormMapper.java framework\utilitaire\ValidationResult.java framework\utilitaire\ConversionService.java framework\utilitaire\ConverterRegistry.java framework\utilitaire\Converter.java framework\utilitaire\ConversionKey.java framework\utilitaire\JsonSerializer.java
 
 REM Compiler les classes HTTP (ex: MultipartFile)
-javac -parameters -classpath "build\classes;jakarta.servlet-api_5.0.0.jar" -d "build\classes" framework\http\*.java
-javac -parameters -classpath "build\classes;jakarta.servlet-api_5.0.0.jar" -d "build\classes" framework\session\*.java
+javac --release 17 -parameters -classpath "build\classes;jakarta.servlet-api_5.0.0.jar" -d "build\classes" framework\http\*.java
+javac --release 17 -parameters -classpath "build\classes;jakarta.servlet-api_5.0.0.jar" -d "build\classes" framework\session\*.java
 
 REM Compiler le service principal qui dépend des utilitaires
-javac -parameters -classpath "build\classes" -d "build\classes" framework\annotation\AnnotationReader.java
+javac --release 17 -parameters -classpath "build\classes" -d "build\classes" framework\annotation\AnnotationReader.java
 
 if errorlevel 1 (
     echo ERREUR: Échec de la compilation des annotations/utilitaires!
@@ -38,7 +38,7 @@ if errorlevel 1 (
 
 REM Compiler les servlets (dépendent de jakarta.servlet-api_5.0.0.jar)
 echo Compilation des servlets...
-javac -parameters -classpath "jakarta.servlet-api_5.0.0.jar;build\classes" -d "build\classes" framework\servlet\*.java framework\utilitaire\ResourceFilter.java framework\utilitaire\UrlTestServlet.java
+javac --release 17 -parameters -classpath "jakarta.servlet-api_5.0.0.jar;build\classes" -d "build\classes" framework\servlet\*.java framework\utilitaire\ResourceFilter.java framework\utilitaire\UrlTestServlet.java
 
 if errorlevel 1 (
     echo ERREUR: Échec de la compilation des servlets!
@@ -48,6 +48,7 @@ if errorlevel 1 (
 
 REM Étape 4: Compilation des classes de test
 echo 4. Compilation des classes de test...
+if exist "testFramework\WEB-INF\classes\testFramework" rmdir /s /q "testFramework\WEB-INF\classes\testFramework"
 if not exist "testFramework\WEB-INF\classes" mkdir "testFramework\WEB-INF\classes"
 
 REM Copier config.properties
@@ -56,12 +57,12 @@ copy "testFramework\resources\config.properties" "testFramework\WEB-INF\classes\
 REM Compiler toutes les classes test (model, controller, admin, util)
 for %%D in (model controller admin util) do (
     if exist "testFramework\com\testframework\%%D" (
-        javac -parameters -classpath "jakarta.servlet-api_5.0.0.jar;build\classes;testFramework\WEB-INF\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\%%D\*.java
+        javac --release 17 -parameters -classpath "jakarta.servlet-api_5.0.0.jar;build\classes;testFramework\WEB-INF\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\%%D\*.java
     )
 )
 
 REM Compiler la classe principale
-javac -parameters -classpath "jakarta.servlet-api_5.0.0.jar;build\classes;testFramework\WEB-INF\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\Main.java
+javac --release 17 -parameters -classpath "jakarta.servlet-api_5.0.0.jar;build\classes;testFramework\WEB-INF\classes" -d "testFramework\WEB-INF\classes" testFramework\com\testframework\Main.java
 
 if errorlevel 1 (
     echo ERREUR: Échec de la compilation des classes de test!
